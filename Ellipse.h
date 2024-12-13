@@ -3,17 +3,18 @@
 
 #include "SVGElements.h"
 
-class Ellipse : public SVGElements {
+class EllipseSVG : public SVGElements{
 private:
-    int cx, cy;
-    int rx, ry;
-    std::string fill, stroke;
-    int stroke_width;
-    double stroke_opacity, fill_opacity;
+    float cx, cy, rx, ry;
 
 public:
-    Ellipse(int cx, int cy, int rx, int ry, const std::string& fill, double fill_opacity, const std::string& stroke, int stroke_width, double stroke_opacity);
-    void render() const override;
+    EllipseSVG(float cx, float cy, float rx, float ry, 
+               const std::string& fill, float fill_opacity, 
+               const std::string& stroke, float stroke_width, float stroke_opacity,
+               Transform transform);
+
+    void render(HDC hdc) const override;
+    PointSVG getCenter() const override;
 };
 
 #endif // ELLIPSE_H

@@ -3,19 +3,20 @@
 
 #include "SVGElements.h"
 
-class Rect : public SVGElements {
+class RectSVG : public SVGElements {
 private:
-    int x, y, width, height;
-    std::string fill;
-    double fill_opacity;
-    std::string stroke;
-    int stroke_width;
-    
-    
+    float x, y, width, height;  // Position and size of the rectangle
 
 public:
-    Rect(int x, int y, int width, int height, const std::string& fill, double fill_opacity, const std::string& stroke,  int stroke_width);
-    void render() const override;
+    // Constructor to initialize the rectangle attributes
+    RectSVG(float x, float y, float width, float height, 
+            const std::string& fill, float fill_opacity, 
+            const std::string& stroke, float stroke_width, float stroke_opacity,
+            Transform transform);
+
+    // Render method to draw the rectangle
+    void render(HDC hdc) const override;
+    PointSVG getCenter() const override;
 };
 
 #endif // RECT_H

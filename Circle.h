@@ -3,16 +3,19 @@
 
 #include "SVGElements.h"
 
-class Circle : public SVGElements {
+class CircleSVG : public SVGElements{
 private:
-    int cx, cy, r;
-    std::string fill, stroke;
-    int stroke_width;
-    double stroke_opacity, fill_opacity;
+    float cx, cy, r;
 
 public:
-    Circle(int cx, int cy, int r, const std::string& fill, double fill_opacity, const std::string& stroke, int stroke_width, double stroke_opacity);
-    void render() const override;
+    CircleSVG(float cx, float cy, float r,
+              const std::string& fill, float fill_opacity,
+              const std::string& stroke, float stroke_width, float stroke_opacity,
+              Transform transform);
+    
+    void render(HDC hdc) const override;  // Ghi đè phương thức render
+    PointSVG getCenter() const override;  // Ghi đè phương thức getCenter
 };
 
 #endif // CIRCLE_H
+

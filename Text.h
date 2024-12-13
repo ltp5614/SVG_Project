@@ -2,17 +2,31 @@
 #define TEXT_H
 
 #include "SVGElements.h"
+#include <iostream>
 
-class Text : public SVGElements {
+class TextSVG : public SVGElements {
 private:
-    int x, y;
-    int font_size;
+    float x, y;
+    float dx, dy;
+    float font_size;
     std::string content;
-    std::string fill;
+    std::wstring font;
 
 public:
-    Text(int x, int y, int font_size, const std::string& content, const std::string& fill);
-    void render() const override;
+    TextSVG(float x, float y, float dx, float dy,
+            float font_size, const std::string& content, const std::wstring& font,
+            const std::string& fill, float fill_opacity, 
+            const std::string& stroke, float stroke_width, float stroke_opacity,
+            Transform transform);
+
+    void render(HDC hdc) const override;
+    PointSVG getCenter() const override;
+
+    // Getter và Setter
+    float getFontSize() const;
+    void setFontSize(float value);
+
+    void applyFontSize(float font_size);
 };
 
 #endif // TEXT_H

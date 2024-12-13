@@ -2,20 +2,20 @@
 #define POLYGON_H
 
 #include "SVGElements.h"
+#include <vector>
 
-class Polygon : public SVGElements
-{
+class PolygonSVG : public SVGElements {
 private:
     std::vector<std::pair<int, int>> points;
-    std::string stroke;
-    std::string fill;
-    double fill_opacity;
-    int stroke_width;
-    double stroke_opacity;
 
 public:
-    Polygon(const std::vector<std::pair<int, int>>& points, const std::string& fill, double fill_opacity, const std::string& stroke, int stroke_width, double stroke_opacity);
-    void render() const override;
+    PolygonSVG(const std::vector<std::pair<int, int>>& points, 
+               const std::string& fill, float fill_opacity, 
+               const std::string& stroke, float stroke_width, float stroke_opacity,
+               Transform transform);
+    
+    void render(HDC hdc) const override;
+    PointSVG getCenter() const override;
 };
 
 #endif // POLYGON_H
