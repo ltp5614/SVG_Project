@@ -11,7 +11,6 @@
 #include "rapidxml.hpp"
 #include "Color.h"
 #include "Transform.h"
-#include "BoudingBox.h"
 
 #pragma comment (lib,"Gdiplus.lib")
 

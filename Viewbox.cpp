@@ -112,7 +112,7 @@ void Viewbox::render(Graphics& graphics, RECT& window) {
 
 	scaleX = width / viewWidth;
 	scaleY = height / viewHeight;
-	scale = min(scaleX, scaleY);
+	scale = std::min(scaleX, scaleY);
 
 	translateX = (width - viewWidth * scale) / 2;
 	translateY = (height - viewHeight * scale) / 2;
