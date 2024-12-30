@@ -8,6 +8,7 @@ EllipseSVG::EllipseSVG(float cx, float cy, float rx, float ry,
           cx(cx), cy(cy), rx(rx), ry(ry) {}
 
 
+<<<<<<< HEAD
 void EllipseSVG::render(Gdiplus::Graphics& graphics, Gdiplus::Matrix& matrix) const
 {
     // Phân tích chuỗi màu để tạo đối tượng Color cho fill và stroke
@@ -63,8 +64,32 @@ void EllipseSVG::render(Gdiplus::Graphics& graphics, Gdiplus::Matrix& matrix) co
     // Vẽ ellipse
     graphics.FillEllipse(&fillBrush, cx - rx, cy - ry, 2 * rx, 2 * ry);
     graphics.DrawEllipse(&strokePen, cx - rx, cy - ry, 2 * rx, 2 * ry);
+=======
+void EllipseSVG::render(HDC hdc) const {
+    // Phân tích chuỗi màu để tạo đối tượng Color cho fill và stroke
+    ColorSVG fillColor = ColorSVG::parseColor(fill);
+    ColorSVG strokeColor = ColorSVG::parseColor(stroke);
+
+    // Tạo đối tượng Graphics
+    Gdiplus::Graphics graphics(hdc);
+
+    // Tạo đối tượng Pen và Brush sử dụng các giá trị màu và độ trong suốt
+    Gdiplus::Pen pen(Gdiplus::Color(255 * stroke_opacity, strokeColor.getRed(), strokeColor.getGreen(), strokeColor.getBlue()), stroke_width);
+    Gdiplus::SolidBrush brush(Gdiplus::Color(255 * fill_opacity, fillColor.getRed(), fillColor.getGreen(), fillColor.getBlue()));
+
+    PointSVG center = getCenter();
+    transform.apply(graphics, center);
+
+    // Vẽ ellipse
+    graphics.FillEllipse(&brush, cx - rx, cy - ry, 2 * rx, 2 * ry);
+    graphics.DrawEllipse(&pen, cx - rx, cy - ry, 2 * rx, 2 * ry);
+>>>>>>> bdff51b2642e4b1bea23852307c0aa3840ef044f
 }
 
 PointSVG EllipseSVG::getCenter() const {
 	return PointSVG(cx, cy);
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> bdff51b2642e4b1bea23852307c0aa3840ef044f

@@ -9,15 +9,20 @@ LineSVG::LineSVG(float x1, float y1, float x2, float y2,
         : SVGElements(fill, stroke, fill_opacity, stroke_width, stroke_opacity, transform), 
           x1(x1), y1(y1), x2(x2), y2(y2) {}
 
+<<<<<<< HEAD
 
 
 
 void LineSVG::render(Gdiplus::Graphics& graphics, Gdiplus::Matrix& matrix) const
+=======
+void LineSVG::render(HDC hdc) const 
+>>>>>>> bdff51b2642e4b1bea23852307c0aa3840ef044f
 {
     // Phân tích chuỗi màu để tạo đối tượng Color cho stroke
     ColorSVG strokeColor = ColorSVG::parseColor(stroke);
 
     // Tạo đối tượng Graphics
+<<<<<<< HEAD
     Gdiplus::Matrix currentMatrix;
 
     Gdiplus::REAL Elements[6];
@@ -60,3 +65,20 @@ void LineSVG::render(Gdiplus::Graphics& graphics, Gdiplus::Matrix& matrix) const
 PointSVG LineSVG::getCenter() const {
 	return PointSVG((x1 + x2) / 2, (y1 + y2) / 2);
 }
+=======
+    Gdiplus::Graphics graphics(hdc);
+
+    // Tạo đối tượng Pen sử dụng các giá trị màu và độ trong suốt
+    Gdiplus::Pen pen(Gdiplus::Color(255 * stroke_opacity, strokeColor.getRed(), strokeColor.getGreen(), strokeColor.getBlue()), stroke_width);
+
+    PointSVG center = getCenter();
+    transform.apply(graphics, center);
+
+    // Vẽ đường thẳng
+    graphics.DrawLine(&pen, x1, y1, x2, y2);
+}
+
+PointSVG LineSVG::getCenter() const {
+	return PointSVG((x1 + x2) / 2, (y1 + y2) / 2);
+}
+>>>>>>> bdff51b2642e4b1bea23852307c0aa3840ef044f

@@ -1,6 +1,13 @@
 #ifndef TRANSFORM_H
 #define TRANSFORM_H
 
+<<<<<<< HEAD
+=======
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
+>>>>>>> bdff51b2642e4b1bea23852307c0aa3840ef044f
 #include <iostream>
 #include <string>
 #include <sstream>
@@ -24,6 +31,7 @@ public:
 	Transform(float translateX, float translateY, float scaleX, float scaleY, float rotationAngle);
 
 	//Apply transform
+<<<<<<< HEAD
 	void apply(Gdiplus::Matrix& parentMatrix, PointSVG center) const; 
 
 
@@ -31,6 +39,13 @@ public:
 	static Transform loadTransform(rapidxml::xml_node<>* node);
   static void parseCommand(const std::string& command, const std::string& values, Transform& transform);
 
+=======
+	void apply(Gdiplus::Graphics& graphics, PointSVG center) const;
+	void combine(Gdiplus::Graphics& graphics) const;
+
+	//Load transform from file
+	static Transform loadTransform(rapidxml::xml_node<>* node);
+>>>>>>> bdff51b2642e4b1bea23852307c0aa3840ef044f
 
 	//Getter
 	float getTranslateX() const;
@@ -48,8 +63,15 @@ public:
 
 	//Operator
 	bool operator==(const Transform& other) const;
+<<<<<<< HEAD
   bool isDefault() const;
 
 };
 
 #endif
+=======
+	friend std::ostream& operator<<(std::ostream& os, const Transform& transform);
+};
+
+#endif
+>>>>>>> bdff51b2642e4b1bea23852307c0aa3840ef044f

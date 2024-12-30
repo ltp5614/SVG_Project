@@ -3,7 +3,11 @@
 #include "SVGDocuments.h"
 #include "Factory.h"
 
+<<<<<<< HEAD
 SVGDocuments SVGDocuments::loadFile(const std::string& filePath, Viewbox* viewbox) {
+=======
+SVGDocuments SVGDocuments::loadFile(const std::string& filePath) {
+>>>>>>> bdff51b2642e4b1bea23852307c0aa3840ef044f
     SVGDocuments list;
     SVGFactoryRegistry factoryRegistry;
     SVGFactoryRegistrar factoryRegister;
@@ -23,6 +27,14 @@ SVGDocuments SVGDocuments::loadFile(const std::string& filePath, Viewbox* viewbo
     size_t fileSize = static_cast<size_t>(file.tellg());
     file.seekg(0, std::ios::beg);
 
+<<<<<<< HEAD
+=======
+    if (fileSize > 1000000) {
+        std::cout << "File is too large to process." << std::endl;
+        return list;
+    }
+
+>>>>>>> bdff51b2642e4b1bea23852307c0aa3840ef044f
     // Use heap-allocated buffer
     std::vector<char> buffer;
     buffer.reserve(fileSize + 1); // Allocate space for the file + null terminator
@@ -42,8 +54,11 @@ SVGDocuments SVGDocuments::loadFile(const std::string& filePath, Viewbox* viewbo
 
     // Get the root node
     rapidxml::xml_node<>* rootNode = doc.first_node();
+<<<<<<< HEAD
     viewbox->parseViewbox(rootNode);
 
+=======
+>>>>>>> bdff51b2642e4b1bea23852307c0aa3840ef044f
     if (!rootNode) {
         std::cout << "XML file empty" << std::endl;
         return list;
@@ -73,6 +88,10 @@ void SVGDocuments::addElement(std::unique_ptr<SVGElements> element) {
     else {
 		std::cout << "Element is null" << std::endl;
 	}
+<<<<<<< HEAD
+=======
+    
+>>>>>>> bdff51b2642e4b1bea23852307c0aa3840ef044f
 }
 
 void SVGDocuments::modifyElement(int elementId, std::unique_ptr<SVGElements> newElement) {
@@ -91,6 +110,7 @@ std::vector<std::unique_ptr<SVGElements>>& SVGDocuments::getElements() {
     return elements;
 }
 
+<<<<<<< HEAD
 std::vector<std::pair<float, float>> parsePoints(const std::string& pointsStr) {
     std::vector<std::pair<float, float>> points;
 
@@ -125,13 +145,31 @@ std::vector<std::pair<float, float>> parsePoints(const std::string& pointsStr) {
         // Ghép từng cặp thành (x, y)
         for (size_t i = 0; i + 1 < coords.size(); i += 2) {
             points.emplace_back(coords[i], coords[i + 1]);
+=======
+std::vector<std::pair<int, int>> parsePoints(const std::string& pointsStr) {
+    std::vector<std::pair<int, int>> points;
+    std::istringstream ss(pointsStr);
+    std::string point;
+
+    while (getline(ss, point, ' ')) {
+        int x, y;
+        char comma;
+        std::istringstream pointStream(point);
+
+        if (pointStream >> x >> comma >> y && comma == ',') {
+            points.emplace_back(x, y);
+>>>>>>> bdff51b2642e4b1bea23852307c0aa3840ef044f
         }
     }
 
     return points;
 }
 
+<<<<<<< HEAD
 void SVGDocuments::render(Graphics& graphics) const {
+=======
+void SVGDocuments::render(HDC hdc) const {
+>>>>>>> bdff51b2642e4b1bea23852307c0aa3840ef044f
     std::cout << "Render called" << std::endl;
 
     if (elements.empty()) {
@@ -139,10 +177,17 @@ void SVGDocuments::render(Graphics& graphics) const {
         return;
     }
 
+<<<<<<< HEAD
     Gdiplus::Matrix matrix;
     for (const auto& element : elements) {
         if (element) {
             element->render(graphics, matrix);
+=======
+    for (const auto& element : elements) {
+        if (element) {
+            std::cout << "Rendering element" << std::endl;  // In ra khi render
+            element->render(hdc);
+>>>>>>> bdff51b2642e4b1bea23852307c0aa3840ef044f
         } else {
             std::cout << "Element is null" << std::endl;  // In ra nếu element bị null
         }

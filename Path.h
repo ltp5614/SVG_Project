@@ -8,17 +8,27 @@ class PathSVG : public SVGElements{
 private:
     std::vector<PathCommand> commands;
 
+<<<<<<< HEAD
     void skipWhitespace(const std::string& str, int& index) const;
     // Hàm đọc một số (float)
     float parseNumber(const std::string& str, int& index) const;
 
 
+=======
+>>>>>>> bdff51b2642e4b1bea23852307c0aa3840ef044f
 public:
     PathSVG(const std::string& pointsData, 
             const std::string& fill, float fill_opacity,
             const std::string& stroke, float stroke_width, float stroke_opacity,
             Transform transform);
 
+<<<<<<< HEAD
+=======
+    void skipWhitespace(const std::string& str, int& index) const;
+    // Hàm đọc một số (float)
+    float parseNumber(const std::string& str, int& index) const;
+
+>>>>>>> bdff51b2642e4b1bea23852307c0aa3840ef044f
     void renderArc(Gdiplus::Graphics& graphics, Gdiplus::GraphicsPath& path, 
                    Gdiplus::PointF& currentPoint, const std::vector<float>& params) const;
 
@@ -39,12 +49,19 @@ public:
 
     // Xóa toàn bộ path
     void clear();
+<<<<<<< HEAD
     int getNumberOfParametersForCommand(char command) const;
 
     // Phân tích chuỗi SVG path và nạp vào Path
     void parseFromSVGString(const std::string& svgPath);
     void render(Gdiplus::Graphics& graphics, Gdiplus::Matrix& matrix) const override;
 
+=======
+
+    // Phân tích chuỗi SVG path và nạp vào Path
+    void parseFromSVGString(const std::string& svgPath);
+    void render(HDC hdc) const override;
+>>>>>>> bdff51b2642e4b1bea23852307c0aa3840ef044f
     PointSVG getCenter() const override;
 };
 

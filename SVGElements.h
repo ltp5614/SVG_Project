@@ -1,17 +1,23 @@
 #ifndef SVGELEMENTS_H
 #define SVGELEMENTS_H
 
+<<<<<<< HEAD
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
 
+=======
+>>>>>>> bdff51b2642e4b1bea23852307c0aa3840ef044f
 #include <string>
 #include <windows.h>
 #include <gdiplus.h>
 #include "rapidxml.hpp"
 #include "Color.h"
 #include "Transform.h"
+<<<<<<< HEAD
 #include "BoudingBox.h"
+=======
+>>>>>>> bdff51b2642e4b1bea23852307c0aa3840ef044f
 
 #pragma comment (lib,"Gdiplus.lib")
 
@@ -30,7 +36,11 @@ class SVGElements {
                   float fill_opacity, float stroke_width, float stroke_opacity,
                   Transform transform);
 
+<<<<<<< HEAD
       virtual void render(Gdiplus::Graphics& graphics, Gdiplus::Matrix& matrix) const = 0; // Phương thức render ảo
+=======
+      virtual void render(HDC hdc) const = 0; // Phương thức render ảo
+>>>>>>> bdff51b2642e4b1bea23852307c0aa3840ef044f
       virtual PointSVG getCenter() const = 0; // Phương thức lấy tâm ảo
 
       // Getter và Setter
@@ -56,6 +66,11 @@ class SVGElements {
 						   const std::string& stroke, float stroke_width,
 						   float stroke_opacity, Transform transform);
 
+<<<<<<< HEAD
+=======
+      friend std::ostream& operator<<(std::ostream& os, const SVGElements& svgElements);
+
+>>>>>>> bdff51b2642e4b1bea23852307c0aa3840ef044f
       virtual ~SVGElements() = default;
 };
 

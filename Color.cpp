@@ -19,6 +19,7 @@ float ColorSVG::getAlpha() {
 	return alpha;
 }
 
+<<<<<<< HEAD
 
 std::string toLower(const std::string& str) 
 {
@@ -30,6 +31,10 @@ std::string toLower(const std::string& str)
 ColorSVG ColorSVG::parseColor(const std::string& colorStr) {
     std::string normalizedColor = toLower(colorStr); // Chuẩn hóa về chữ thường
     auto it = colorMap.find(normalizedColor);
+=======
+ColorSVG ColorSVG::parseColor(const std::string& colorStr) {
+    auto it = colorMap.find(colorStr);
+>>>>>>> bdff51b2642e4b1bea23852307c0aa3840ef044f
     if (it != colorMap.end()) {
         auto color = it->second;
         int r = std::get<0>(color);
@@ -48,6 +53,10 @@ ColorSVG ColorSVG::parseColor(const std::string& colorStr) {
         size_t end = colorStr.find(")");
 
         if (start == std::string::npos || end == std::string::npos) {
+<<<<<<< HEAD
+=======
+            std::cout << "Invalid color data" << std::endl;
+>>>>>>> bdff51b2642e4b1bea23852307c0aa3840ef044f
             return ColorSVG(-1, -1, -1, -1.0);
         }
 
@@ -87,6 +96,11 @@ ColorSVG ColorSVG::parseColor(const std::string& colorStr) {
         return ColorSVG(red, green, blue, alpha);
     }
 
+<<<<<<< HEAD
+=======
+    // Nếu không khớp định dạng nào
+    std::cout << "Unsupported color format: " << colorStr << std::endl;
+>>>>>>> bdff51b2642e4b1bea23852307c0aa3840ef044f
     return ColorSVG(-1, -1, -1, -1.0);
 }
 
@@ -94,7 +108,10 @@ bool isValidColor(int color) {
     return (color >= 0 && color <= 255);
 }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> bdff51b2642e4b1bea23852307c0aa3840ef044f
 const std::unordered_map<std::string, std::tuple<int, int, int>> ColorSVG::colorMap = {
     {"red", {255, 0, 0}},
     {"green", {0, 255, 0}},
@@ -107,6 +124,7 @@ const std::unordered_map<std::string, std::tuple<int, int, int>> ColorSVG::color
     {"gray", {128, 128, 128}},
     {"grey", {128, 128, 128}},
     {"darkslategray", {47, 79, 79}},
+<<<<<<< HEAD
     {"darkslategrey", {47, 79, 79}},
     {"midnightblue", {25, 25, 112}},
     {"blueviolet", {138, 43, 226}},
@@ -117,3 +135,8 @@ const std::unordered_map<std::string, std::tuple<int, int, int>> ColorSVG::color
     {"skyblue", {135, 206, 235}}
 };
 
+=======
+	{"darkslategrey", {47, 79, 79}},
+    {"midnightblue", {25, 25, 112}}
+};
+>>>>>>> bdff51b2642e4b1bea23852307c0aa3840ef044f
