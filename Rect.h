@@ -15,11 +15,7 @@ public:
             Transform transform);
 
     // Render method to draw the rectangle
-<<<<<<< HEAD
     void render(Gdiplus::Graphics& graphics, Gdiplus::Matrix& matrix) const override;
-=======
-    void render(HDC hdc) const override;
->>>>>>> bdff51b2642e4b1bea23852307c0aa3840ef044f
     PointSVG getCenter() const override;
 };
 

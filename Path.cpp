@@ -23,11 +23,8 @@ float PathSVG::parseNumber(const std::string& str, int& index) const {
     int start = index;
     while (index < str.size() &&
             (std::isdigit(str[index]) || str[index] == '.' || str[index] == '-' || str[index] == '+')) {
-<<<<<<< HEAD
               if(str[index] == '-' && index != start)
                 break; 
-=======
->>>>>>> bdff51b2642e4b1bea23852307c0aa3840ef044f
         ++index;
     }
     if (start == index) throw std::runtime_error("Expected a number");
@@ -112,23 +109,14 @@ void PathSVG::clear() {
     commands.clear();
 }
 
-<<<<<<< HEAD
 void PathSVG::parseFromSVGString(const std::string& svgPath) {
     int i = 0;
     commands.clear();
     char lastCommand = '\0';
-=======
-// Phân tích chuỗi SVG path và nạp vào Path
-void PathSVG::parseFromSVGString(const std::string& svgPath) {
-    int i = 0;
-
-    Gdiplus::PointF lastPoint(0, 0); // Điểm trước đó (Mặc định ban đầu)
->>>>>>> bdff51b2642e4b1bea23852307c0aa3840ef044f
 
     while (i < svgPath.size()) {
         skipWhitespace(svgPath, i);
 
-<<<<<<< HEAD
         // Kiểm tra còn ký tự nào không
         if (i >= svgPath.size()) break;
 
@@ -164,38 +152,10 @@ void PathSVG::parseFromSVGString(const std::string& svgPath) {
         }
 
         // Thêm lệnh vào danh sách
-=======
-        // Lấy lệnh (ký tự đầu tiên)
-        if (i >= svgPath.size()) break;
-        char command = svgPath[i];
-
-        if (!std::isalpha(command)) {
-            throw std::runtime_error("Expected a command");
-        }
-        
-        ++i;
-
-        // Đọc các tham số
-        std::vector<float> parameters;
-
-        if (command != 'Z' && command != 'z') { // Z không có tham số
-            while (i < svgPath.size() && !std::isalpha(svgPath[i])) {
-                parameters.push_back(parseNumber(svgPath, i));
-                skipWhitespace(svgPath, i);
-
-                // Nếu có dấu phẩy, bỏ qua
-                if (i < svgPath.size() && svgPath[i] == ',') {
-                    ++i;
-                }
-            }
-        }
-
->>>>>>> bdff51b2642e4b1bea23852307c0aa3840ef044f
         commands.emplace_back(command, parameters);
     }
 }
 
-<<<<<<< HEAD
 // Hàm lấy số lượng tham số cần thiết cho từng lệnh
 int PathSVG::getNumberOfParametersForCommand(char command) const {
     switch (command) {
@@ -259,26 +219,10 @@ void PathSVG::render(Gdiplus::Graphics& graphics, Gdiplus::Matrix& matrix) const
         ),
         stroke_width
     );
-=======
-void PathSVG::render(HDC hdc) const {
-
-    ColorSVG fillColor = ColorSVG::parseColor(fill);
-    ColorSVG strokeColor = ColorSVG::parseColor(stroke);
-
-    Gdiplus::Graphics graphics(hdc);
-    Gdiplus::SolidBrush fillBrush(Gdiplus::Color(255 * fill_opacity, fillColor.getRed(), fillColor.getGreen(), fillColor.getBlue()));
-
-    // Tạo đối tượng Pen cho màu viền và độ trong suốt
-    Gdiplus::Pen strokePen(Gdiplus::Color(255 * stroke_opacity, strokeColor.getRed(), strokeColor.getGreen(), strokeColor.getBlue()), stroke_width);
->>>>>>> bdff51b2642e4b1bea23852307c0aa3840ef044f
 
 
     // Dùng GraphicsPath để lưu các đoạn Path
     Gdiplus::GraphicsPath path;
-<<<<<<< HEAD
-=======
-
->>>>>>> bdff51b2642e4b1bea23852307c0aa3840ef044f
     Gdiplus::PointF currentPoint(0, 0);
 
     for (const auto& command : commands) {
@@ -286,7 +230,6 @@ void PathSVG::render(HDC hdc) const {
         const auto& params = command.getParameters();
 
         switch (cmd) {
-<<<<<<< HEAD
             case 'M': // Moveto (Absolute)
                 currentPoint = Gdiplus::PointF(params[0], params[1]);
                 path.StartFigure();
@@ -358,94 +301,18 @@ void PathSVG::render(HDC hdc) const {
 
             default:
                 std::cerr << "Unsupported command: " << cmd << std::endl;
-=======
-        // Moveto
-        case 'M' : case 'm' : {
-            currentPoint = Gdiplus::PointF(params[0], params[1]);
-            path.StartFigure(); // Bắt đầu một hình mới
-            break;
-        }
-        
-        // Lineto
-        case 'L' : case 'l' : {
-            path.AddLine(currentPoint, Gdiplus::PointF(params[0], params[1]));
-            currentPoint = Gdiplus::PointF(params[0], params[1]);
-            break;
-        }
-        
-	    // Horizontal lineto
-        case 'H' : case 'h' : {
-            path.AddLine(currentPoint, Gdiplus::PointF(params[0], currentPoint.Y));
-            currentPoint.X = params[0];
-            break;
-	    }
-
-        // Vertical lineto
-        case 'V' : case 'v' : {
-            path.AddLine(currentPoint, Gdiplus::PointF(currentPoint.X, params[0]));
-            currentPoint.Y = params[0];
-            break;
-	    }
-
-        // Cubic Bézier curve
-        case 'C' : case 'c' : {
-            path.AddBezier(currentPoint, 
-                            Gdiplus::PointF(params[0], params[1]), 
-                            Gdiplus::PointF(params[2], params[3]), 
-                            Gdiplus::PointF(params[4], params[5]));
-            currentPoint = Gdiplus::PointF(params[4], params[5]);
-            break;
-        }
-
-        // Quadratic Bézier curve
-        case 'Q' : case 'q' : {
-            path.AddBezier(currentPoint,
-                            Gdiplus::PointF((2 * params[0] + currentPoint.X) / 3, 
-                                            (2 * params[1] + currentPoint.Y) / 3), 
-                            Gdiplus::PointF((2 * params[0] + params[2]) / 3, 
-                                            (2 * params[1] + params[3]) / 3), 
-                            Gdiplus::PointF(params[2], params[3]));
-            currentPoint = Gdiplus::PointF(params[2], params[3]);
-            break;
-        }
-
-        // Elliptical arc
-        case 'A' : case 'a' : {
-            renderArc(graphics, path, currentPoint, params);
-            break;
-        }
-        
-        // Closepath
-        case 'Z' : case 'z' : {
-            path.CloseFigure();
-            break;
-        }
-
-        default: {
-            std::cout << "Unknown command: " << cmd << std::endl;
-        }
->>>>>>> bdff51b2642e4b1bea23852307c0aa3840ef044f
         }
     }
 
     PointSVG center = getCenter();
-<<<<<<< HEAD
     transform.apply(currentMatrix, center);
     graphics.SetTransform(&currentMatrix);
-=======
-    transform.apply(graphics, center);
->>>>>>> bdff51b2642e4b1bea23852307c0aa3840ef044f
 
     // Vẽ nền (fill)
     graphics.FillPath(&fillBrush, &path);
 
     // Vẽ viền (stroke)
     graphics.DrawPath(&strokePen, &path);
-<<<<<<< HEAD
-=======
-
-    std::cout << "Render path" << std::endl;
->>>>>>> bdff51b2642e4b1bea23852307c0aa3840ef044f
 }
 
 PointSVG PathSVG::getCenter() const {
@@ -457,11 +324,7 @@ PointSVG PathSVG::getCenter() const {
         const auto& params = command.getParameters();
 
         // Duyệt qua từng cặp (x, y) trong danh sách tham số
-<<<<<<< HEAD
         for (size_t i = 0; i + 1 < params.size(); i += 2) {
-=======
-        for (size_t i = 0; i < params.size(); i += 2) {
->>>>>>> bdff51b2642e4b1bea23852307c0aa3840ef044f
             sumX += params[i];        // Tổng các giá trị x
             sumY += params[i + 1];    // Tổng các giá trị y
             pointCount++;             // Đếm số điểm
@@ -474,8 +337,4 @@ PointSVG PathSVG::getCenter() const {
     }
 
     return PointSVG(sumX / pointCount, sumY / pointCount);
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> bdff51b2642e4b1bea23852307c0aa3840ef044f

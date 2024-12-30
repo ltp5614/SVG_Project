@@ -8,7 +8,6 @@ RectSVG::RectSVG(float x, float y, float width, float height,
         :SVGElements(fill, stroke, fill_opacity, stroke_width, stroke_opacity, transform),
          x(x), y(y), width(width), height(height) {}
 
-<<<<<<< HEAD
 void RectSVG::render(Gdiplus::Graphics& graphics, Gdiplus::Matrix& matrix) const
 {
 // Kiểm tra nếu cả fill và stroke đều là "none"
@@ -73,31 +72,3 @@ void RectSVG::render(Gdiplus::Graphics& graphics, Gdiplus::Matrix& matrix) const
 PointSVG RectSVG::getCenter() const {
 	return PointSVG(x + width / 2, y + height / 2);
 }
-=======
-// Render method definition
-void RectSVG::render(HDC hdc) const {
-    // Parse color for fill and stroke
-    ColorSVG fillColor = ColorSVG::parseColor(fill);  // Assuming Color::parseColor() returns a Color object
-    ColorSVG strokeColor = ColorSVG::parseColor(stroke);
-
-    // Create GDI+ Graphics object
-    Gdiplus::Graphics graphics(hdc);
-
-    // Create Pen (stroke) and SolidBrush (fill) for GDI+ rendering
-    Gdiplus::Pen pen(Gdiplus::Color(255, strokeColor.getRed(), strokeColor.getGreen(), strokeColor.getBlue()), stroke_width);
-    Gdiplus::SolidBrush brush(Gdiplus::Color(255 * fill_opacity, fillColor.getRed(), fillColor.getGreen(), fillColor.getBlue()));
-
-    PointSVG center = getCenter();
-    transform.apply(graphics, center);
-
-    // Draw the filled rectangle
-    graphics.FillRectangle(&brush, x, y, width, height);
-
-    // Draw the rectangle outline (stroke)
-    graphics.DrawRectangle(&pen, x, y, width, height);
-}
-
-PointSVG RectSVG::getCenter() const {
-	return PointSVG(x + width / 2, y + height / 2);
-}
->>>>>>> bdff51b2642e4b1bea23852307c0aa3840ef044f

@@ -14,13 +14,10 @@ SVGElements::SVGElements(const std::string& fill, const std::string& stroke,
     if (stroke != "none" && stroke_opacity == 0) {
         this->stroke_opacity = 1;
     }
-<<<<<<< HEAD
 
     if (stroke != "none" && stroke_width == 0) {
         this->stroke_width = 1;
     }
-=======
->>>>>>> bdff51b2642e4b1bea23852307c0aa3840ef044f
 }
 
 // Getter và Setter
@@ -40,7 +37,6 @@ float SVGElements::getStrokeOpacity() const { return stroke_opacity; }
 void SVGElements::SVGElements::setStrokeOpacity(float value) { stroke_opacity = value; }
 
 Transform SVGElements::getTransform() const { return transform; }
-<<<<<<< HEAD
 void SVGElements::setTransform(const Transform& value) {
   if(transform.getRotationAngle() == 0)
   {
@@ -100,52 +96,3 @@ void SVGElements::applyAttributes(const std::string& fill, float fill_opacity,
         setStrokeOpacity(1);
     }
 }
-=======
-void SVGElements::setTransform(const Transform& value) { transform = value; }
-
-void SVGElements::applyAttributes(const std::string& fill, float fill_opacity,
-								  const std::string& stroke, float stroke_width,
-								  float stroke_opacity, Transform transform) {
-    if (fill == "none") {
-		this->setFill(fill);
-	}
-
-    if (fill_opacity == 1.0f) {
-        this->setFillOpacity(fill_opacity);
-    }
-    
-    if (stroke == "none") {
-		this->setStroke(stroke);
-	}
-
-    if (stroke_width == 0.0f) {
-		this->setStrokeWidth(stroke_width);
-	}
-
-    if (stroke_opacity == 1.0f) {
-        this->setStrokeOpacity(stroke_opacity);
-	}
-    
-    if (transform == Transform()) {
-		this->setTransform(transform);
-	}
-
-    std::cout << "After applyGroupAttributes in SVGElement: "
-        << "Fill: " << fill
-        << ", Stroke: " << stroke
-        << ", Stroke Width: " << stroke_width
-        << ", Stroke Opacity: " << stroke_opacity
-        << ", Transform: " << transform << std::endl;
-}
-
-std::ostream& operator<<(std::ostream& os, const SVGElements& svgElements) {
-	os << "Fill: " << svgElements.fill << std::endl
-	   << "Fill Opacity: " << svgElements.fill_opacity << std::endl
-	   << "Stroke: " << svgElements.stroke << std::endl
-	   << "Stroke Width: " << svgElements.stroke_width << std::endl
-	   << "Stroke Opacity: " << svgElements.stroke_opacity << std::endl
-	   << "Transform: " << svgElements.transform << std::endl;
-
-	return os;
-}
->>>>>>> bdff51b2642e4b1bea23852307c0aa3840ef044f

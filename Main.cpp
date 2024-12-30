@@ -8,11 +8,7 @@ float rotationAngle = 30.0f;  // Góc xoay cố định
 bool hasRendered = false;     // Cờ để xác định đã render hay chưa
 int windowWidth = 800;        // Chiều rộng cửa sổ mặc định
 int windowHeight = 600;       // Chiều cao cửa sổ mặc định
-<<<<<<< HEAD
-std::string FileName = "svg-14.svg";
-=======
-std::string svgFilePath = "svg-02.svg";  // Default path
->>>>>>> bdff51b2642e4b1bea23852307c0aa3840ef044f
+std::string FileName = "svg-18.svg";
 
 // Hàm thực hiện phép xoay đồ họa
 void RotateGraphics(Gdiplus::Graphics& graphics, float angle, int width, int height) {
@@ -47,11 +43,8 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
         // Khởi tạo Graphics object
         PAINTSTRUCT ps;
         HDC hdc = BeginPaint(hwnd, &ps);
-<<<<<<< HEAD
         RECT window;
         GetWindowRect(hwnd, &window);
-=======
->>>>>>> bdff51b2642e4b1bea23852307c0aa3840ef044f
 
         // Khởi tạo GDI+ Graphics
         Gdiplus::Graphics graphics(hdc);
@@ -62,7 +55,6 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
         // Tính toán scale và rotation
         RotateGraphics(graphics, rotationAngle, windowWidth, windowHeight);
         ScaleGraphics(graphics, 800, 600, windowWidth, windowHeight);
-<<<<<<< HEAD
         Viewbox* viewbox = new Viewbox();
 
         // Tải và render file SVG
@@ -77,17 +69,6 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
         svg.render(graphics);
 
         delete viewbox;
-=======
-
-        // Tải và render file SVG
-        if (!hasRendered) {  // Tải SVG lần đầu
-            svg = svg.loadFile(svgFilePath);  // Đảm bảo đường dẫn chính xác
-            hasRendered = true;
-        }
-
-        // Render SVG với các transform áp dụng
-        svg.render(hdc);
->>>>>>> bdff51b2642e4b1bea23852307c0aa3840ef044f
 
         EndPaint(hwnd, &ps);
         return 0;
@@ -113,53 +94,27 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
     return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
 
-<<<<<<< HEAD
 int main() {
     try {
         // Khởi tạo GDI+
-=======
-int main(int argc, char* argv[]) {
-    try {
-        // Handle command-line argument for SVG file path
-        
-        if (argc > 1) {
-            svgFilePath = argv[1];  // Use the argument passed
-        }
-
-        std::cout << "Loading SVG from: " << svgFilePath << std::endl;
-
-        // Initialize GDI+
->>>>>>> bdff51b2642e4b1bea23852307c0aa3840ef044f
         Gdiplus::GdiplusStartupInput gdiplusStartupInput;
         ULONG_PTR gdiplusToken;
         GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
 
-<<<<<<< HEAD
         // Định nghĩa lớp cửa sổ
-=======
-        // Define window class
->>>>>>> bdff51b2642e4b1bea23852307c0aa3840ef044f
         const wchar_t* className = L"SVGWindowClass";
         WNDCLASSW wc = { 0 };
         wc.lpfnWndProc = WindowProc;
         wc.hInstance = GetModuleHandle(NULL);
         wc.lpszClassName = className;
 
-<<<<<<< HEAD
         // Đăng ký lớp cửa sổ
-=======
-        // Register window class
->>>>>>> bdff51b2642e4b1bea23852307c0aa3840ef044f
         if (!RegisterClassW(&wc)) {
             MessageBoxW(NULL, L"Window class registration failed!", L"Error", MB_OK | MB_ICONERROR);
             return 0;
         }
 
-<<<<<<< HEAD
         // Tạo cửa sổ
-=======
-        // Create the window
->>>>>>> bdff51b2642e4b1bea23852307c0aa3840ef044f
         HWND hwnd = CreateWindowExW(0, className, L"SVG Renderer", WS_OVERLAPPEDWINDOW,
             CW_USEDEFAULT, CW_USEDEFAULT, 800, 600,
             NULL, NULL, wc.hInstance, NULL);
@@ -169,26 +124,17 @@ int main(int argc, char* argv[]) {
             return 0;
         }
 
-<<<<<<< HEAD
         // Hiển thị cửa sổ
         ShowWindow(hwnd, SW_SHOWNORMAL);
         UpdateWindow(hwnd);
 
         // Vòng lặp xử lý sự kiện
-=======
-        // Show the window
-        ShowWindow(hwnd, SW_SHOWNORMAL);
-        UpdateWindow(hwnd);
-
-        // Main event loop
->>>>>>> bdff51b2642e4b1bea23852307c0aa3840ef044f
         MSG msg;
         while (GetMessage(&msg, NULL, 0, 0)) {
             TranslateMessage(&msg);
             DispatchMessage(&msg);
         }
 
-<<<<<<< HEAD
         // Dừng GDI+
         Gdiplus::GdiplusShutdown(gdiplusToken);
     }
@@ -196,15 +142,6 @@ int main(int argc, char* argv[]) {
     catch (const std::exception& ex) {
 		std::cerr << "Exception: " << ex.what() << std::endl;
 	}
-=======
-        // Shutdown GDI+
-        Gdiplus::GdiplusShutdown(gdiplusToken);
-    }
-
-    catch (const std::exception& ex) {
-        std::cerr << "Exception: " << ex.what() << std::endl;
-    }
->>>>>>> bdff51b2642e4b1bea23852307c0aa3840ef044f
 
     catch (...) {
         MessageBoxW(NULL, L"An unknown error occurred!", L"Error", MB_OK | MB_ICONERROR);
@@ -212,8 +149,4 @@ int main(int argc, char* argv[]) {
     }
 
     return 0;
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> bdff51b2642e4b1bea23852307c0aa3840ef044f
