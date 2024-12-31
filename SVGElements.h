@@ -11,52 +11,51 @@
 #include "rapidxml.hpp"
 #include "Color.h"
 #include "Transform.h"
-#include "BoudingBox.h"
+#include "GradientManager.h"
+#include <algorithm>  // Để sử dụng std::min và std::max
 
 #pragma comment (lib,"Gdiplus.lib")
 
-
 class SVGElements {
-  protected:
-      std::string fill;
-      std::string stroke;
-      float fill_opacity;
-      float stroke_width;
-      float stroke_opacity;
-      Transform transform;
-      
-  public:
-      SVGElements(const std::string& fill, const std::string& stroke,
-                  float fill_opacity, float stroke_width, float stroke_opacity,
-                  Transform transform);
+protected:
+	std::string fill;
+	std::string stroke;
+	float fill_opacity;
+	float stroke_width;
+	float stroke_opacity;
+	Transform transform;
 
-      virtual void render(Gdiplus::Graphics& graphics, Gdiplus::Matrix& matrix) const = 0; // Phương thức render ảo
-      virtual PointSVG getCenter() const = 0; // Phương thức lấy tâm ảo
+public:
+	SVGElements(const std::string& fill, const std::string& stroke,
+		float fill_opacity, float stroke_width, float stroke_opacity,
+		Transform transform);
 
-      // Getter và Setter
-      std::string getFill() const;
-      void setFill(const std::string& value);
+	virtual void render(Gdiplus::Graphics& graphics, Gdiplus::Matrix& matrix, GradientManager gradients) const = 0; // Phương thức render ảo
 
-      float getFillOpacity() const;
-      void setFillOpacity(float value);
+	// Getter và Setter
+	std::string getFill() const;
+	void setFill(const std::string& value);
 
-      std::string getStroke() const;
-      void setStroke(const std::string& value);
+	float getFillOpacity() const;
+	void setFillOpacity(float value);
 
-      float getStrokeWidth() const;
-      void setStrokeWidth(float value);
+	std::string getStroke() const;
+	void setStroke(const std::string& value);
 
-      float getStrokeOpacity() const;
-      void setStrokeOpacity(float value);
+	float getStrokeWidth() const;
+	void setStrokeWidth(float value);
 
-      Transform getTransform() const;
-      void setTransform(const Transform& value);
+	float getStrokeOpacity() const;
+	void setStrokeOpacity(float value);
 
-      void applyAttributes(const std::string& fill, float fill_opacity,
-						   const std::string& stroke, float stroke_width,
-						   float stroke_opacity, Transform transform);
+	Transform getTransform() const;
+	void setTransform(const Transform& value);
 
-      virtual ~SVGElements() = default;
+	void applyAttributes(const std::string& fill, float fill_opacity,
+		const std::string& stroke, float stroke_width,
+		float stroke_opacity, Transform transform);
+
+	virtual ~SVGElements() = default;
 };
 
 #endif // SVGELEMENTS_H

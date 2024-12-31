@@ -43,9 +43,7 @@ public:
 
     // Phân tích chuỗi SVG path và nạp vào Path
     void parseFromSVGString(const std::string& svgPath);
-    void render(Gdiplus::Graphics& graphics, Gdiplus::Matrix& matrix) const override;
-
-    PointSVG getCenter() const override;
+    void render(Gdiplus::Graphics& graphics, Gdiplus::Matrix& matrix, GradientManager gradients) const override;
 };
 
 #endif // PATH_H

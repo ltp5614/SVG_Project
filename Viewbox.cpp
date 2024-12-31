@@ -97,11 +97,12 @@ void Viewbox::parseViewbox(rapidxml::xml_node<>* node) {
 
 void Viewbox::render(Graphics& graphics, RECT& window) {
 	float width = 0, height = 0;
-	float scaleX = 1, scaleY = 1, scaleXY = 1;
+	float scaleX = 1, scaleY = 1, scale = 1;
+	float translateX, translateY;
 
 	if (portWidth == 0 || portHeight == 0) {
-		width = window.right - window.left - 16;
-		height = window.bottom - window.top - 39;
+		width = window.right - window.left;
+		height = window.bottom - window.top;
 	}
 
 	else {
@@ -111,15 +112,16 @@ void Viewbox::render(Graphics& graphics, RECT& window) {
 
 	scaleX = width / viewWidth;
 	scaleY = height / viewHeight;
-	scaleXY = min(scaleX, scaleY);
+	scale = min(scaleX, scaleY);
 
-	if (viewHeight != 0 || viewWidth != 0) {
-		graphics.SetClip(Gdiplus::RectF(0, 0, width, height));
-	}
-		
-	graphics.ScaleTransform(scaleXY, scaleXY);
+	translateX = (width - viewWidth * scale) / 2;
+	translateY = (height - viewHeight * scale) / 2;
+	
+	graphics.TranslateTransform(translateX, translateY);
+	graphics.ScaleTransform(scale, scale);
 	graphics.SetSmoothingMode(Gdiplus::SmoothingModeAntiAlias);
 	graphics.SetCompositingMode(Gdiplus::CompositingModeSourceOver);
 	graphics.SetPixelOffsetMode(Gdiplus::PixelOffsetModeHighQuality);
 	graphics.SetInterpolationMode(Gdiplus::InterpolationModeHighQuality);
+
 }

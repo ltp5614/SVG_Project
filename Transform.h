@@ -24,12 +24,12 @@ public:
 	Transform(float translateX, float translateY, float scaleX, float scaleY, float rotationAngle);
 
 	//Apply transform
-	void apply(Gdiplus::Matrix& parentMatrix, PointSVG center) const; 
+	void apply(Gdiplus::Matrix& parentMatrix) const;
 
 
 	//Load transform from file
 	static Transform loadTransform(rapidxml::xml_node<>* node);
-  static void parseCommand(const std::string& command, const std::string& values, Transform& transform);
+	static void parseCommand(const std::string& command, const std::string& values, Transform& transform);
 
 
 	//Getter
@@ -48,7 +48,7 @@ public:
 
 	//Operator
 	bool operator==(const Transform& other) const;
-  bool isDefault() const;
+	bool isDefault() const;
 
 };
 

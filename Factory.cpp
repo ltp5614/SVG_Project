@@ -15,6 +15,18 @@ std::unique_ptr<SVGElements> RectFactory::createElement(rapidxml::xml_node<>* no
     float stroke_opacity = node->first_attribute("stroke-opacity") ? std::stof(node->first_attribute("stroke-opacity")->value()) : 0.0f;
     std::string fill = node->first_attribute("fill") ? node->first_attribute("fill")->value() : "none";
     std::string stroke = node->first_attribute("stroke") ? node->first_attribute("stroke")->value() : "none";
+
+        // Kiểm tra nếu fill là một phần của kiểu style
+    if (node->first_attribute("style")) {
+        std::string style = node->first_attribute("style")->value();
+        auto styleMap = parseStyle(style);
+        
+        // Kiểm tra nếu trong style có thuộc tính fill
+        if (styleMap.find("fill") != styleMap.end()) {
+            fill = styleMap["fill"];
+        }
+    }
+
     Transform transform = Transform::loadTransform(node);
 
     // Create a rectangle object
@@ -168,7 +180,7 @@ std::unique_ptr<SVGElements> GroupFactory::createElement(rapidxml::xml_node<>* n
     SVGFactoryRegistry factoryRegistry;
     SVGFactoryRegistrar factoryRegister;
 
-    factoryRegister.registerFactories(factoryRegistry);
+    factoryRegister.registerAllFactories(factoryRegistry);
 
     // Duyệt qua các con trong nhóm (group)
     for (auto childNode = node->first_node(); childNode; childNode = childNode->next_sibling()) {
@@ -234,7 +246,7 @@ std::unique_ptr<SVGElements> SVGFactoryRegistry::createElementFromFactory(const 
 }
 
 // Register factories
-void SVGFactoryRegistrar::registerFactories(SVGFactoryRegistry& registry) {
+void SVGFactoryRegistrar::registerAllFactories(SVGFactoryRegistry& registry) {
 	registerFactories<RectFactory>(registry, "rect");
     registerFactories<CircleFactory>(registry, "circle");
     registerFactories<EllipseFactory>(registry, "ellipse");
@@ -244,4 +256,30 @@ void SVGFactoryRegistrar::registerFactories(SVGFactoryRegistry& registry) {
     registerFactories<PolylineFactory>(registry, "polyline");
     registerFactories<TextFactory>(registry, "text");
     registerFactories<GroupFactory>(registry, "g");
+}
+
+
+std::unordered_map<std::string, std::string> parseStyle(const std::string& style) {
+    std::unordered_map<std::string, std::string> styleMap;
+    std::istringstream styleStream(style);  // Tạo một stream từ chuỗi style
+    std::string token;
+
+    // Đọc từng cặp khóa-giá trị từ chuỗi style
+    while (std::getline(styleStream, token, ';')) {
+        // Tìm vị trí dấu ':', phân tách khóa và giá trị
+        size_t pos = token.find(':');
+        if (pos != std::string::npos) {
+            std::string key = token.substr(0, pos);   // Lấy phần trước dấu ':'
+            std::string value = token.substr(pos + 1); // Lấy phần sau dấu ':'
+            
+            // Loại bỏ khoảng trắng thừa ở đầu và cuối key và value
+            key.erase(key.find_last_not_of(" \t") + 1);
+            value.erase(value.find_last_not_of(" \t") + 1);
+
+            // Lưu vào map
+            styleMap[key] = value;
+        }
+    }
+
+    return styleMap;
 }

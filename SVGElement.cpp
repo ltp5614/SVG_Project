@@ -37,19 +37,18 @@ float SVGElements::getStrokeOpacity() const { return stroke_opacity; }
 void SVGElements::SVGElements::setStrokeOpacity(float value) { stroke_opacity = value; }
 
 Transform SVGElements::getTransform() const { return transform; }
+
 void SVGElements::setTransform(const Transform& value) {
-  if(transform.getRotationAngle() == 0)
-  {
+  if(transform.getRotationAngle() == 0) {
     transform.setRotationAngle(value.getRotationAngle());
   }
-  if(transform.getTranslateX() == 0 && transform.getTranslateY() == 0)
-  {
+
+  if(transform.getTranslateX() == 0 && transform.getTranslateY() == 0) {
     transform.setTranslateX(value.getTranslateX());
     transform.setTranslateY(value.getTranslateY());
-
   }
-  if(transform.getScaleX() == 1 && transform.getScaleY() == 1)
-  {
+
+  if(transform.getScaleX() == 1 && transform.getScaleY() == 1) {
     transform.setScaleX(value.getScaleX());
     transform.setScaleY(value.getScaleY());
   }

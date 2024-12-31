@@ -175,11 +175,25 @@ int PathSVG::getNumberOfParametersForCommand(char command) const {
 }
 
 
-void PathSVG::render(Gdiplus::Graphics& graphics, Gdiplus::Matrix& matrix) const
+void PathSVG::render(Gdiplus::Graphics& graphics, Gdiplus::Matrix& matrix, GradientManager gradients) const
 {
 // Kiểm tra nếu cả fill và stroke đều là "none"
     ColorSVG fillColor = (fill == "none" && stroke == "none") ? ColorSVG(0, 0, 0) : ColorSVG::parseColor(fill);
     ColorSVG strokeColor = (fill == "none" && stroke == "none") ? ColorSVG(0, 0, 0) : ColorSVG::parseColor(stroke);
+
+
+    
+    int fillAlpha = (fill == "none" && stroke == "none") ? 255 : static_cast<int>(255 * fill_opacity);
+    int strokeAlpha = (fill == "none" && stroke == "none") ? 255 : static_cast<int>(255 * stroke_opacity);
+
+    if (fillAlpha == -1) 
+      fillAlpha = 0;
+    
+    if (strokeAlpha == -1)
+      strokeAlpha = 0;
+
+
+
 
     Gdiplus::Matrix currentMatrix;
 
@@ -196,29 +210,6 @@ void PathSVG::render(Gdiplus::Graphics& graphics, Gdiplus::Matrix& matrix) const
         return value;
     };
 
-    int fillAlpha = (fill == "none" && stroke == "none") ? 255 : static_cast<int>(255 * fill_opacity);
-    int strokeAlpha = (fill == "none" && stroke == "none") ? 255 : static_cast<int>(255 * stroke_opacity);
-
-    // Tạo SolidBrush với màu đã giới hạn và độ trong suốt
-    Gdiplus::SolidBrush fillBrush(
-        Gdiplus::Color(
-            static_cast<BYTE>(clamp(fillAlpha, 0, 255)), // Alpha (độ trong suốt)
-            static_cast<BYTE>(clamp(fillColor.getRed(), 0, 255)),  // Red
-            static_cast<BYTE>(clamp(fillColor.getGreen(), 0, 255)),  // Green
-            static_cast<BYTE>(clamp(fillColor.getBlue(), 0, 255))  // Blue
-        )
-    );
-
-    // Tạo Pen với màu và độ trong suốt đã giới hạn
-    Gdiplus::Pen strokePen(
-        Gdiplus::Color(
-            static_cast<BYTE>(clamp(strokeAlpha, 0, 255)), // Alpha (độ trong suốt)
-            static_cast<BYTE>(clamp(strokeColor.getRed(), 0, 255)), // Red
-            static_cast<BYTE>(clamp(strokeColor.getGreen(), 0, 255)), // Green
-            static_cast<BYTE>(clamp(strokeColor.getBlue(), 0, 255)) // Blue
-        ),
-        stroke_width
-    );
 
 
     // Dùng GraphicsPath để lưu các đoạn Path
@@ -304,37 +295,69 @@ void PathSVG::render(Gdiplus::Graphics& graphics, Gdiplus::Matrix& matrix) const
         }
     }
 
-    PointSVG center = getCenter();
-    transform.apply(currentMatrix, center);
+    transform.apply(currentMatrix);
     graphics.SetTransform(&currentMatrix);
 
+    
+    // Tính toán bounding box của đường dẫn
+    Gdiplus::RectF bounds;
+    path.GetBounds(&bounds, &matrix);
+
+    // Lấy chiều rộng và chiều cao từ bounding box
+    float widthBox = bounds.Width;
+    float heightBox = bounds.Height;
+
+
+
+    Gdiplus::Brush* fillBrush = nullptr;
+    if (fill.find("url(") == 0) {
+        // Lấy ID gradient từ `fill="url(#gradient_id)"`
+        std::string gradientId = fill.substr(5, fill.size() - 6); // Bỏ "url(" và ")"
+        const Gradient* gradient = gradients.getGradient(gradientId); // Hàm getGradientById bạn tự cài đặt
+        
+        if (gradient) {
+            gradient->applyForBrush(matrix, fillBrush, widthBox, heightBox); // Áp dụng gradient
+        }
+     
+    }
+
+    if (!fillBrush) {
+        // Nếu không có gradient, sử dụng màu solid
+
+        ColorSVG fillColor = ColorSVG::parseColor(fill);
+        fillBrush = new Gdiplus::SolidBrush(
+            Gdiplus::Color(
+                static_cast<BYTE>(clamp(fillAlpha, 0, 255)), // Alpha
+                static_cast<BYTE>(clamp(fillColor.getRed(), 0, 255)),  // Red
+                static_cast<BYTE>(clamp(fillColor.getGreen(), 0, 255)),  // Green
+                static_cast<BYTE>(clamp(fillColor.getBlue(), 0, 255))  // Blue
+            )
+        );
+    }
+
+    // Xử lý stroke
+    Gdiplus::Pen* strokePen = nullptr;
+
+    if (!strokePen) {
+        // Nếu không có gradient, sử dụng màu solid
+
+
+        ColorSVG strokeColor = ColorSVG::parseColor(stroke);
+        strokePen = new Gdiplus::Pen(
+            Gdiplus::Color(
+                static_cast<BYTE>(clamp(strokeAlpha, 0, 255)), // Alpha
+                static_cast<BYTE>(clamp(strokeColor.getRed(), 0, 255)),  // Red
+                static_cast<BYTE>(clamp(strokeColor.getGreen(), 0, 255)),  // Green
+                static_cast<BYTE>(clamp(strokeColor.getBlue(), 0, 255))  // Blue
+            ),
+            stroke_width
+        );
+    }
+
+
     // Vẽ nền (fill)
-    graphics.FillPath(&fillBrush, &path);
+    graphics.FillPath(fillBrush, &path);
 
     // Vẽ viền (stroke)
-    graphics.DrawPath(&strokePen, &path);
-}
-
-PointSVG PathSVG::getCenter() const {
-    float sumX = 0;
-    float sumY = 0;
-    int pointCount = 0;
-
-    for (const auto& command : commands) {
-        const auto& params = command.getParameters();
-
-        // Duyệt qua từng cặp (x, y) trong danh sách tham số
-        for (size_t i = 0; i + 1 < params.size(); i += 2) {
-            sumX += params[i];        // Tổng các giá trị x
-            sumY += params[i + 1];    // Tổng các giá trị y
-            pointCount++;             // Đếm số điểm
-        }
-    }
-
-    // Tính tọa độ tâm bằng trung bình cộng của x và y
-    if (pointCount == 0) {
-        return PointSVG(0, 0); // Trả về tâm mặc định nếu không có điểm nào
-    }
-
-    return PointSVG(sumX / pointCount, sumY / pointCount);
+    graphics.DrawPath(strokePen, &path);
 }

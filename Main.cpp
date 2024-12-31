@@ -8,7 +8,7 @@ float rotationAngle = 30.0f;  // Góc xoay cố định
 bool hasRendered = false;     // Cờ để xác định đã render hay chưa
 int windowWidth = 800;        // Chiều rộng cửa sổ mặc định
 int windowHeight = 600;       // Chiều cao cửa sổ mặc định
-std::string FileName = "svg-14.svg";
+std::string FileName = "svg-01.svg"; // Path
 
 // Hàm thực hiện phép xoay đồ họa
 void RotateGraphics(Gdiplus::Graphics& graphics, float angle, int width, int height) {
@@ -46,6 +46,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
         RECT window;
         GetWindowRect(hwnd, &window);
 
+
         // Khởi tạo GDI+ Graphics
         Gdiplus::Graphics graphics(hdc);
 
@@ -59,15 +60,15 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 
         // Tải và render file SVG
         if (!hasRendered) {  // Tải SVG lần đầu
-            svg = svg.loadFile(FileName, viewbox);  // Đảm bảo đường dẫn chính xác
+            svg.loadFile(FileName, viewbox);  // Đảm bảo đường dẫn chính xác
             hasRendered = true;
         }
 
         viewbox->render(graphics, window);
 
+
         // Render SVG với các transform áp dụng
         svg.render(graphics);
-
         delete viewbox;
 
         EndPaint(hwnd, &ps);
@@ -94,27 +95,35 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
     return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
 
-int main() {
+int main(int argc, char* argv[]) {
     try {
-        // Khởi tạo GDI+
+        // Handle command-line argument for SVG file path
+
+        if (argc > 1) {
+            FileName = argv[1];  // Use the argument passed
+        }
+
+        std::cout << "Loading SVG from: " << FileName << std::endl;
+
+        // Initialize GDI+
         Gdiplus::GdiplusStartupInput gdiplusStartupInput;
         ULONG_PTR gdiplusToken;
         GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
 
-        // Định nghĩa lớp cửa sổ
+        // Define window class
         const wchar_t* className = L"SVGWindowClass";
         WNDCLASSW wc = { 0 };
         wc.lpfnWndProc = WindowProc;
         wc.hInstance = GetModuleHandle(NULL);
         wc.lpszClassName = className;
 
-        // Đăng ký lớp cửa sổ
+        // Register window class
         if (!RegisterClassW(&wc)) {
             MessageBoxW(NULL, L"Window class registration failed!", L"Error", MB_OK | MB_ICONERROR);
             return 0;
         }
 
-        // Tạo cửa sổ
+        // Create the window
         HWND hwnd = CreateWindowExW(0, className, L"SVG Renderer", WS_OVERLAPPEDWINDOW,
             CW_USEDEFAULT, CW_USEDEFAULT, 800, 600,
             NULL, NULL, wc.hInstance, NULL);
@@ -124,24 +133,24 @@ int main() {
             return 0;
         }
 
-        // Hiển thị cửa sổ
+        // Show the window
         ShowWindow(hwnd, SW_SHOWNORMAL);
         UpdateWindow(hwnd);
 
-        // Vòng lặp xử lý sự kiện
+        // Main event loop
         MSG msg;
         while (GetMessage(&msg, NULL, 0, 0)) {
             TranslateMessage(&msg);
             DispatchMessage(&msg);
         }
 
-        // Dừng GDI+
+        // Shutdown GDI+
         Gdiplus::GdiplusShutdown(gdiplusToken);
     }
-    
+
     catch (const std::exception& ex) {
-		std::cerr << "Exception: " << ex.what() << std::endl;
-	}
+        std::cerr << "Exception: " << ex.what() << std::endl;
+    }
 
     catch (...) {
         MessageBoxW(NULL, L"An unknown error occurred!", L"Error", MB_OK | MB_ICONERROR);

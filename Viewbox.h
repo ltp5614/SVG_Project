@@ -8,6 +8,7 @@
 #include <gdiplus.h>
 #include "rapidxml.hpp"
 
+using namespace std;
 using namespace rapidxml;
 using namespace Gdiplus;
 
@@ -40,8 +41,6 @@ public:
 
 	void parseViewbox(rapidxml::xml_node<>* node);
 	void render(Graphics& graphics, RECT& window);
-	float convertToPixel(const std::string& value);
-
 };
 
 #endif // VIEWBOX_H

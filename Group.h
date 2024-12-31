@@ -8,20 +8,19 @@
 class GroupSVG : public SVGElements {
 private:
 	std::vector<std::unique_ptr<SVGElements>> elements;
-  float fontSize;
+	float fontSize;
 
 
 public:
-	GroupSVG(std::vector<std::unique_ptr<SVGElements>> elements, const std::string& fill, float fill_opacity, 
-               const std::string& stroke, float stroke_width, float stroke_opacity,
-               Transform transform, float fontSize);
+	GroupSVG(std::vector<std::unique_ptr<SVGElements>> elements, const std::string& fill, float fill_opacity,
+		const std::string& stroke, float stroke_width, float stroke_opacity,
+		Transform transform, float fontSize);
 
-  void render(Gdiplus::Graphics& graphics, Gdiplus::Matrix& matrix) const override;
-	PointSVG getCenter() const override;
+	void render(Gdiplus::Graphics& graphics, Gdiplus::Matrix& matrix, GradientManager gradients) const override;
 	void applyGroupAttributes();
-  void inheritedAttributes(const std::string& fill, float fill_opacity, 
-               const std::string& stroke, float stroke_width, float stroke_opacity,
-               Transform transform, float fontSize);
+	void inheritedAttributes(const std::string& fill, float fill_opacity,
+		const std::string& stroke, float stroke_width, float stroke_opacity,
+		Transform transform, float fontSize);
 };
 
 

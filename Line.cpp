@@ -12,7 +12,7 @@ LineSVG::LineSVG(float x1, float y1, float x2, float y2,
 
 
 
-void LineSVG::render(Gdiplus::Graphics& graphics, Gdiplus::Matrix& matrix) const
+void LineSVG::render(Gdiplus::Graphics& graphics, Gdiplus::Matrix& matrix, GradientManager gradients) const
 {
     // Phân tích chuỗi màu để tạo đối tượng Color cho stroke
     ColorSVG strokeColor = ColorSVG::parseColor(stroke);
@@ -47,16 +47,9 @@ void LineSVG::render(Gdiplus::Graphics& graphics, Gdiplus::Matrix& matrix) const
         stroke_width
     );
 
-    PointSVG center = getCenter();
-    transform.apply(currentMatrix, center);
+    transform.apply(currentMatrix);
     graphics.SetTransform(&currentMatrix);
 
     // Vẽ đường thẳng
     graphics.DrawLine(&strokePen, x1, y1, x2, y2);
-}
-
-
-
-PointSVG LineSVG::getCenter() const {
-	return PointSVG((x1 + x2) / 2, (y1 + y2) / 2);
 }

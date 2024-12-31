@@ -1,5 +1,6 @@
 #ifndef FACTORY_H
 #define FACTORY_H
+#define _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING
 
 #include "Circle.h"
 #include "Rect.h"
@@ -16,8 +17,6 @@
 #include <functional>
 #include <locale>
 #include <codecvt>
-
-class SVGDocuments; // Forwarding Declaration
 
 // Factory for creating SVG elements
 class SVGElementFactory {
@@ -100,7 +99,9 @@ public:
         });
     }
 
-    void registerFactories(SVGFactoryRegistry& registry);
+    void registerAllFactories(SVGFactoryRegistry& registry);
 };
+
+std::unordered_map<std::string, std::string> parseStyle(const std::string& style);
 
 #endif // FACTORY_H

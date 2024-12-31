@@ -14,9 +14,7 @@ public:
             Transform transform);
 
 
-    void render(Gdiplus::Graphics& graphics, Gdiplus::Matrix& matrix) const override;
-    PointSVG getCenter() const;
-
+    void render(Gdiplus::Graphics& graphics, Gdiplus::Matrix& matrix, GradientManager gradients) const override;
 };
 
 #endif // LINE_H

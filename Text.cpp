@@ -22,7 +22,6 @@ std::wstring TextSVG::trimQuotes(const std::wstring& str) const
 // Hàm tách các font từ chuỗi font-family
 std::vector<std::wstring> TextSVG::parseFontFamily(const std::wstring& fontFamily) const
 {
-    std::cout << "+++++" << stroke_width << std::endl;
     std::vector<std::wstring> fonts;
     std::wstringstream ss(fontFamily);
     std::wstring font;
@@ -39,7 +38,7 @@ std::vector<std::wstring> TextSVG::parseFontFamily(const std::wstring& fontFamil
     }
     return fonts;
 }
-void TextSVG::render(Gdiplus::Graphics& graphics, Gdiplus::Matrix& matrix) const
+void TextSVG::render(Gdiplus::Graphics& graphics, Gdiplus::Matrix& matrix, GradientManager gradients) const
 {
     std::cout << x << " " << y << " " << dx << " " << dy << std::endl;
 
@@ -88,26 +87,12 @@ void TextSVG::render(Gdiplus::Graphics& graphics, Gdiplus::Matrix& matrix) const
     int textAlpha = (fill == "none" && stroke == "none") ? 255 : static_cast<int>(255 * fill_opacity);
     int strokeAlpha = (fill == "none" && stroke == "none") ? 255 : static_cast<int>(255 * stroke_opacity);
 
-    // Tạo SolidBrush cho fill
-    Gdiplus::SolidBrush fillBrush(
-        Gdiplus::Color(
-            static_cast<BYTE>(clamp(textAlpha, 0, 255)),
-            static_cast<BYTE>(clamp(textColor.getRed(), 0, 255)),
-            static_cast<BYTE>(clamp(textColor.getGreen(), 0, 255)),
-            static_cast<BYTE>(clamp(textColor.getBlue(), 0, 255))
-        )
-    );
 
-    // Tạo Pen cho stroke
-    Gdiplus::Pen strokePen(
-        Gdiplus::Color(
-            static_cast<BYTE>(clamp(strokeAlpha, 0, 255)),
-            static_cast<BYTE>(clamp(strokeColor.getRed(), 0, 255)),
-            static_cast<BYTE>(clamp(strokeColor.getGreen(), 0, 255)),
-            static_cast<BYTE>(clamp(strokeColor.getBlue(), 0, 255))
-        ),
-        stroke_width
-    );
+    if (textAlpha == -1) 
+      textAlpha = 0;
+    
+    if (strokeAlpha == -1)
+      strokeAlpha = 0;
 
     std::wstring textContent(content.begin(), content.end());
 
@@ -162,54 +147,65 @@ void TextSVG::render(Gdiplus::Graphics& graphics, Gdiplus::Matrix& matrix) const
     );
 
     // Áp dụng transform sau khi tính toán vị trí
-    PointSVG center = getCenter();
-    transform.apply(currentMatrix, center);
+    transform.apply(currentMatrix);
     graphics.SetTransform(&currentMatrix);
 
+
+    // Chiều rộng và chiều cao của box chứa văn bản
+    float textWidth = bounds.Width;
+    float textHeight = bounds.Height;
+
+
+        Gdiplus::Brush* fillBrush = nullptr;
+    if (fill.find("url(") == 0) {
+        // Lấy ID gradient từ `fill="url(#gradient_id)"`
+        std::string gradientId = fill.substr(5, fill.size() - 6); // Bỏ "url(" và ")"
+        const Gradient* gradient = gradients.getGradient(gradientId); // Hàm getGradientById bạn tự cài đặt
+        
+        if (gradient) {
+            gradient->applyForBrush(matrix, fillBrush, textWidth, textHeight); // Áp dụng gradient
+        }
+     
+    }
+
+    if (!fillBrush) {
+        // Nếu không có gradient, sử dụng màu solid
+
+        ColorSVG textColor = ColorSVG::parseColor(fill);
+        fillBrush = new Gdiplus::SolidBrush(
+            Gdiplus::Color(
+                static_cast<BYTE>(clamp(textAlpha, 0, 255)), // Alpha
+                static_cast<BYTE>(clamp(textColor.getRed(), 0, 255)),  // Red
+                static_cast<BYTE>(clamp(textColor.getGreen(), 0, 255)),  // Green
+                static_cast<BYTE>(clamp(textColor.getBlue(), 0, 255))  // Blue
+            )
+        );
+    }
+
+    // Xử lý stroke
+    Gdiplus::Pen* strokePen = nullptr;
+
+    if (!strokePen) {
+        // Nếu không có gradient, sử dụng màu solid
+
+
+        ColorSVG strokeColor = ColorSVG::parseColor(stroke);
+        strokePen = new Gdiplus::Pen(
+            Gdiplus::Color(
+                static_cast<BYTE>(clamp(strokeAlpha, 0, 255)), // Alpha
+                static_cast<BYTE>(clamp(strokeColor.getRed(), 0, 255)),  // Red
+                static_cast<BYTE>(clamp(strokeColor.getGreen(), 0, 255)),  // Green
+                static_cast<BYTE>(clamp(strokeColor.getBlue(), 0, 255))  // Blue
+            ),
+            stroke_width
+        );
+    }
+
     // Vẽ stroke (viền) cho văn bản
-    graphics.DrawPath(&strokePen, &path);
+    graphics.DrawPath(strokePen, &path);
 
     // Vẽ phần fill của văn bản
-    graphics.FillPath(&fillBrush, &path);
-}
-
-
-
-
-
-PointSVG TextSVG::getCenter() const {
-    Gdiplus::Bitmap tempBitmap(1, 1);
-    Gdiplus::Graphics graphics(&tempBitmap);
-
-    // Lấy DPI của màn hình
-    float dpiX = graphics.GetDpiX();
-    float dpiY = graphics.GetDpiY();
-
-    // Điều chỉnh kích thước font theo DPI
-    float adjustedFontSize = font_size * (dpiX / 96.0f); // 96 DPI là chuẩn của màn hình
-
-    const WCHAR* fontName = font.c_str();
-    
-    Gdiplus::Font font(fontName, adjustedFontSize);
-
-    std::wstring textContent(content.begin(), content.end());
-    
-    float renderX = x + dx;
-    float renderY = y + dy;
-
-    Gdiplus::RectF textBox;
-    graphics.MeasureString(
-        textContent.c_str(), // Convert std::string to std::wstring
-        -1,  // Length of the string (use -1 for null-terminated string)
-        &font,  // Font object
-        Gdiplus::PointF(renderX, renderY), // Position of the text
-        &textBox  // This will store the bounding box for the text
-    );
-
-    float centerX = renderX + textBox.Width / 2;
-    float centerY = renderY + textBox.Height / 2;
-
-	return PointSVG(centerX, centerY);
+    graphics.FillPath(fillBrush, &path);
 }
 
 float TextSVG::getFontSize() const {

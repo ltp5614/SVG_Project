@@ -11,15 +11,18 @@ CircleSVG::CircleSVG(float cx, float cy, float r,
 }
 
 
-void CircleSVG::render(Gdiplus::Graphics& graphics, Gdiplus::Matrix& matrix) const
-{
-    // Phân tích chuỗi màu để tạo đối tượng Color cho fill và stroke
-// Kiểm tra nếu cả fill và stroke đều là "none"
+void CircleSVG::render(Gdiplus::Graphics& graphics, Gdiplus::Matrix& matrix, GradientManager gradients) const {
+
+      // Phân tích chuỗi màu để tạo đối tượng Color cho fill và stroke
     ColorSVG fillColor = (fill == "none" && stroke == "none") ? ColorSVG(0, 0, 0) : ColorSVG::parseColor(fill);
     ColorSVG strokeColor = (fill == "none" && stroke == "none") ? ColorSVG(0, 0, 0) : ColorSVG::parseColor(stroke);
 
+    int fillAlpha = (fill == "none" && stroke == "none") ? 255 : static_cast<int>(255 * fill_opacity);
+    int strokeAlpha = (fill == "none" && stroke == "none") ? 255 : static_cast<int>(255 * stroke_opacity);
 
-    // Tạo đối tượng Graphics
+    if (strokeAlpha == -1) strokeAlpha = 0;
+    if (fillAlpha == -1) fillAlpha = 0;
+
     Gdiplus::Matrix currentMatrix;
 
     Gdiplus::REAL Elements[6];
@@ -27,57 +30,76 @@ void CircleSVG::render(Gdiplus::Graphics& graphics, Gdiplus::Matrix& matrix) con
 
     // Tạo một bản sao của ma trận từ cha
     currentMatrix.SetElements(Elements[0], Elements[1],
-                          Elements[2], Elements[3],
-                          Elements[4], Elements[5]);
+                              Elements[2], Elements[3],
+                              Elements[4], Elements[5]);
+  
+    transform.apply(currentMatrix);
+    // Áp dụng ma trận vào graphics
+    graphics.SetTransform(&currentMatrix);
 
-
-    // Tạo đối tượng Pen và Brush sử dụng các giá trị màu và độ trong suốt
     auto clamp = [](int value, int min, int max) {
         if (value < min) return min;
         if (value > max) return max;
         return value;
     };
 
-    // Tạo SolidBrush với màu đã giới hạn
-    int fillAlpha = (fill == "none" && stroke == "none") ? 255 : static_cast<int>(255 * fill_opacity);
-    int strokeAlpha = (fill == "none" && stroke == "none") ? 255 : static_cast<int>(255 * stroke_opacity);
+    float boxWidth = 2 * r;  // Chiều rộng = 2 * bán kính
+    float boxHeight = 2 * r; // Chiều cao = 2 * bán kính
 
-    // Tạo SolidBrush với màu đã giới hạn và độ trong suốt
-    Gdiplus::SolidBrush fillBrush(
-        Gdiplus::Color(
-            static_cast<BYTE>(clamp(fillAlpha, 0, 255)), // Alpha (độ trong suốt)
-            static_cast<BYTE>(clamp(fillColor.getRed(), 0, 255)),  // Red
-            static_cast<BYTE>(clamp(fillColor.getGreen(), 0, 255)),  // Green
-            static_cast<BYTE>(clamp(fillColor.getBlue(), 0, 255))  // Blue
-        )
-    );
+    // Xử lý fill
+    Gdiplus::Brush* fillBrush = nullptr;
+    if (fill.find("url(") == 0) {
+        // Lấy ID gradient từ `fill="url(#gradient_id)"`
+        std::string gradientId = fill.substr(5, fill.size() - 6); // Bỏ "url(" và ")"
+        std::cout << gradientId << "++++";
+        const Gradient* gradient = gradients.getGradient(gradientId); // Hàm getGradientById bạn tự cài đặt
+        
+        if (gradient) {
+            gradient->applyForBrush(matrix, fillBrush, boxWidth, boxHeight); // Áp dụng gradient
+        }
+     
+    }
 
-    // Tạo Pen với màu và độ trong suốt đã giới hạn
-    Gdiplus::Pen strokePen(
-        Gdiplus::Color(
-            static_cast<BYTE>(clamp(strokeAlpha, 0, 255)), // Alpha (độ trong suốt)
-            static_cast<BYTE>(clamp(strokeColor.getRed(), 0, 255)), // Red
-            static_cast<BYTE>(clamp(strokeColor.getGreen(), 0, 255)), // Green
-            static_cast<BYTE>(clamp(strokeColor.getBlue(), 0, 255)) // Blue
-        ),
-        stroke_width
-    );
+    if (!fillBrush) {
+        // Nếu không có gradient, sử dụng màu solid
 
-    // Lấy tâm và áp dụng transform
-    PointSVG center = getCenter();
-    transform.apply(currentMatrix, center);  // Áp dụng phép biến đổi lên ma trận
+        ColorSVG fillColor = ColorSVG::parseColor(fill);
+        fillBrush = new Gdiplus::SolidBrush(
+            Gdiplus::Color(
+                static_cast<BYTE>(clamp(fillAlpha, 0, 255)), // Alpha
+                static_cast<BYTE>(clamp(fillColor.getRed(), 0, 255)),  // Red
+                static_cast<BYTE>(clamp(fillColor.getGreen(), 0, 255)),  // Green
+                static_cast<BYTE>(clamp(fillColor.getBlue(), 0, 255))  // Blue
+            )
+        );
+    }
 
-    // Áp dụng ma trận vào graphics
-    graphics.SetTransform(&currentMatrix);
+    // Xử lý stroke
+    Gdiplus::Pen* strokePen = nullptr;
+
+    if (!strokePen) {
+        // Nếu không có gradient, sử dụng màu solid
+
+
+        ColorSVG strokeColor = ColorSVG::parseColor(stroke);
+        strokePen = new Gdiplus::Pen(
+            Gdiplus::Color(
+                static_cast<BYTE>(clamp(strokeAlpha, 0, 255)), // Alpha
+                static_cast<BYTE>(clamp(strokeColor.getRed(), 0, 255)),  // Red
+                static_cast<BYTE>(clamp(strokeColor.getGreen(), 0, 255)),  // Green
+                static_cast<BYTE>(clamp(strokeColor.getBlue(), 0, 255))  // Blue
+            ),
+            stroke_width
+        );
+    }
 
     // Vẽ hình tròn
-    graphics.FillEllipse(&fillBrush, cx - r, cy - r, 2 * r, 2 * r);  // Vẽ nền
-    graphics.DrawEllipse(&strokePen, cx - r, cy - r, 2 * r, 2 * r);  // Vẽ viền
+    graphics.FillEllipse(fillBrush, cx - r, cy - r, 2 * r, 2 * r);  // Vẽ nền
+    graphics.DrawEllipse(strokePen, cx - r, cy - r, 2 * r, 2 * r);  // Vẽ viền
 
-    std::cout << "Circle rendered successfully.\n\n";
-}
+    // Giải phóng brush và pen
+    delete fillBrush;
+    delete strokePen;
 
-
-PointSVG CircleSVG::getCenter() const {
-	return PointSVG(cx, cy);
+    std::cout << "Circle rendered successfully with gradient or solid colors.\n\n";
 }

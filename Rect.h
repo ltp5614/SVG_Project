@@ -15,8 +15,7 @@ public:
             Transform transform);
 
     // Render method to draw the rectangle
-    void render(Gdiplus::Graphics& graphics, Gdiplus::Matrix& matrix) const override;
-    PointSVG getCenter() const override;
+    void render(Gdiplus::Graphics& graphics, Gdiplus::Matrix& matrix, GradientManager gradients) const override;
 };
 
 #endif // RECT_H

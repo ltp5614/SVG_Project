@@ -21,8 +21,7 @@ public:
             const std::string& stroke, float stroke_width, float stroke_opacity,
             Transform transform);
 
-    void render(Gdiplus::Graphics& graphics, Gdiplus::Matrix& matrix) const override;
-    PointSVG getCenter() const override;
+    void render(Gdiplus::Graphics& graphics, Gdiplus::Matrix& matrix, GradientManager gradients) const override;
     std::wstring trimQuotes(const std::wstring& str) const;
     std::vector<std::wstring> parseFontFamily(const std::wstring& fontFamily) const;
 

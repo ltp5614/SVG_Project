@@ -14,8 +14,7 @@ public:
                 const std::string& stroke, float stroke_width, float stroke_opacity,
                 Transform transform);
 
-    void render(Gdiplus::Graphics& graphics, Gdiplus::Matrix& matrix) const override;
-    PointSVG getCenter() const override;
+    void render(Gdiplus::Graphics& graphics, Gdiplus::Matrix& matrix, GradientManager gradients) const override;
 };
 
 #endif // POLYLINE_H

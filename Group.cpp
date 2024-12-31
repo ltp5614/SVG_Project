@@ -22,7 +22,7 @@ GroupSVG::GroupSVG(std::vector<std::unique_ptr<SVGElements>> elements, const std
 
 }
 
-void GroupSVG::render(Gdiplus::Graphics& graphics, Gdiplus::Matrix& parentMatrix) const {
+void GroupSVG::render(Gdiplus::Graphics& graphics, Gdiplus::Matrix& parentMatrix, GradientManager gradients) const {
     Gdiplus::Matrix currentMatrix;
 
     Gdiplus::REAL Elements[6];
@@ -36,8 +36,7 @@ void GroupSVG::render(Gdiplus::Graphics& graphics, Gdiplus::Matrix& parentMatrix
 
 
     // Áp dụng phép biến đổi của nhóm hiện tại
-    PointSVG center = getCenter();
-    transform.apply(currentMatrix, center);
+    transform.apply(currentMatrix);
 
     graphics.SetTransform(&currentMatrix);
     Gdiplus::GraphicsState state = graphics.Save();
@@ -45,35 +44,15 @@ void GroupSVG::render(Gdiplus::Graphics& graphics, Gdiplus::Matrix& parentMatrix
     for (const auto& element : elements) {
         if (auto groupElement = dynamic_cast<GroupSVG*>(element.get())) {
 
-            groupElement->render(graphics, currentMatrix);
+            groupElement->render(graphics, currentMatrix, gradients);
         } else {
 
-            element->render(graphics, currentMatrix);
+            element->render(graphics, currentMatrix, gradients);
         }
     }
 
     // Phục hồi trạng thái ban đầu của Graphics
     graphics.Restore(state);
-}
-
-
-
-// Phương thức tính toán tâm của nhóm (center of group)
-PointSVG GroupSVG::getCenter() const {
-    float sumX = 0, sumY = 0;
-    size_t count = 0;
-
-    for (const auto& element : elements) {
-        PointSVG elementCenter = element->getCenter();
- 
-        sumX += elementCenter.getX();
-        sumY += elementCenter.getY();
-
-        count++;
-    }
-
-    // Trả về trung tâm của nhóm
-    return PointSVG(sumX / count, sumY / count);
 }
 
 void GroupSVG::applyGroupAttributes() 
